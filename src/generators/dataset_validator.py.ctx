@@ -16,7 +16,10 @@ conceptualTests:
   - name: "Esempio senza system fallisce"
     steps:
       - action: "validate_example con solo user+assistant"
-        expect: "(False, 'First message must have role=system')"
+        expect: >
+          (False, stringa di errore contenente "role='system'"),
+          il codice alla riga 36 ritorna: "First message must have role='system'"
+          (le virgolette singole intorno a system fanno parte del messaggio)
   - name: "Esempio con role collision fallisce"
     steps:
       - action: "validate_example con user+user"

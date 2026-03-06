@@ -27,7 +27,17 @@ conceptualTests:
     steps:
       - action: >
           forge run --dominio restaurant_booking --skip-dataset --skip-training
-          dove outputs/checkpoints/{run_id}/merged/ NON esiste ancora
+          Stato iniziale: data/processed/restaurant_booking.jsonl NON esiste,
+          outputs/checkpoints/{run_id}/merged/ NON esiste.
+          Step 1 (skip_dataset=True, skip_training=True): il controllo dataset
+          viene saltato perché 'not skip_training' è False (riga 83);
+          stampa "Skipping dataset generation" senza errore.
+          Step 2 (skip_training=True): candidate.exists() è False, merged_path
+          rimane None, stampa warning "skipping export too".
+          Step 3: condizione 'not skip_export and merged_path is not None' è False
+          (merged_path è None) quindi _run_export NON viene chiamato.
+          Stampa "Pipeline complete!" e termina con exit code 0.
         expect: >
-          dataset step skippato, training step skippato,
-          export skippato (merged model non trovato), pipeline termina senza errore
+          dataset step skippato senza errore (controllo dataset saltato quando
+          anche training è skippato), training step skippato, export skippato
+          (merged_path=None), pipeline termina senza errore con exit code 0

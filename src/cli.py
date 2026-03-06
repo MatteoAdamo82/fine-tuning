@@ -81,7 +81,8 @@ def run(
     if not skip_dataset:
         _run_dataset(config, dataset_path)
     else:
-        if not dataset_path.exists():
+        # Dataset is only needed if training will run
+        if not skip_training and not dataset_path.exists():
             console.print(f"[red]Dataset not found: {dataset_path}[/red]")
             raise typer.Exit(1)
         console.print(f"[yellow]Skipping dataset generation, using: {dataset_path}[/yellow]")
