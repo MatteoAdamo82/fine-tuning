@@ -81,6 +81,9 @@ def run_training(
     )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+    # max_seq_length via tokenizer — compatibile con tutte le versioni TRL
+    # (era SFTConfig in 0.12, SFTTrainer in 0.13, rimosso in 0.15)
+    tokenizer.model_max_length = config.max_seq_length
 
     # Load model
     console.print(f"Loading model: {config.hf_model_id}")
@@ -118,7 +121,6 @@ def run_training(
     console.print(f"Dataset size: {len(dataset)} examples")
 
     # Training arguments
-    # Note: max_seq_length moved from SFTConfig to SFTTrainer in TRL >= 0.12
     training_args = SFTConfig(
         output_dir=str(output_dir),
         num_train_epochs=config.epochs,
@@ -143,7 +145,6 @@ def run_training(
         train_dataset=dataset,
         peft_config=lora_config,
         processing_class=tokenizer,
-        max_seq_length=config.max_seq_length,
     )
 
     console.print("[bold]Starting training...[/bold]")
