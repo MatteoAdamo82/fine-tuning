@@ -6,6 +6,7 @@ model:
   hf_id: Qwen/Qwen3-4B
   ollama_tag: qwen3:4b
   architecture: qwen3
+  model_class: AutoModelForCausalLM
   parameters: 4B
 
 resources:

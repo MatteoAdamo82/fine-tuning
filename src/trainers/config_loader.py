@@ -17,10 +17,10 @@ import yaml
 @dataclass
 class TrainingConfig:
     # Model
-    hf_model_id: str = "Qwen/Qwen3.5-0.8B"
-    ollama_tag: str = "qwen3.5:0.8b"
-    architecture: str = "qwen3_5"
-    model_class: str = "AutoModelForImageTextToText"
+    hf_model_id: str = "Qwen/Qwen3-0.6B"
+    ollama_tag: str = "qwen3:0.6b"
+    architecture: str = "qwen3"
+    model_class: str = "AutoModelForCausalLM"
 
     # Domain / dataset
     domain: str = ""
