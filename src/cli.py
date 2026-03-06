@@ -54,11 +54,16 @@ def run(
     lingua: Optional[str] = typer.Option(None, "--lingua", help="Override domain lingua"),
     run_id: Optional[str] = typer.Option(None, "--run-id", help="Custom run identifier"),
     generator: Optional[str] = typer.Option(None, "--generator", "-g", help="Generator: groq, gemini, ollama (overrides config)"),
+    force_dataset: bool = typer.Option(False, "--force-dataset", help="Regenerate dataset even if it already exists"),
     skip_dataset: bool = typer.Option(False, "--skip-dataset", help="Skip dataset generation (use existing)"),
     skip_training: bool = typer.Option(False, "--skip-training", help="Skip training"),
     skip_export: bool = typer.Option(False, "--skip-export", help="Skip export"),
 ) -> None:
-    """Run the full pipeline: dataset generation → training → export."""
+    """Run the full pipeline: dataset generation → training → export.
+
+    Dataset is reused if already present (saves API calls).
+    Use --force-dataset to regenerate, or edit data/processed/{dominio}.jsonl manually.
+    """
     from src.trainers.config_loader import load_config
 
     run_id = run_id or f"{dominio}-{uuid.uuid4().hex[:8]}"
@@ -81,14 +86,21 @@ def run(
     dataset_path = DATA_DIR / "processed" / f"{dominio}.jsonl"
 
     # Step 1: Dataset generation
-    if not skip_dataset:
-        _run_dataset(config, dataset_path)
-    else:
-        # Dataset is only needed if training will run
+    # Reuse existing dataset unless --force-dataset or --skip-dataset is set.
+    # This avoids burning API quota on retries and lets users edit the JSONL manually.
+    if skip_dataset:
         if not skip_training and not dataset_path.exists():
             console.print(f"[red]Dataset not found: {dataset_path}[/red]")
             raise typer.Exit(1)
-        console.print(f"[yellow]Skipping dataset generation, using: {dataset_path}[/yellow]")
+        console.print(f"[yellow]--skip-dataset: using existing {dataset_path}[/yellow]")
+    elif dataset_path.exists() and not force_dataset:
+        n_lines = sum(1 for _ in open(dataset_path))
+        console.print(
+            f"[green]Dataset already exists[/green]: {dataset_path} "
+            f"({n_lines} examples) — use [bold]--force-dataset[/bold] to regenerate"
+        )
+    else:
+        _run_dataset(config, dataset_path)
 
     # Step 2: Training
     merged_path = None
@@ -115,8 +127,13 @@ def dataset(
     output: Optional[str] = typer.Option(None, "--output", help="Output JSONL path"),
     n_examples: Optional[int] = typer.Option(None, "--n-examples", help="Number of examples to generate"),
     generator: Optional[str] = typer.Option(None, "--generator", "-g", help="Generator: groq, gemini, ollama (overrides config)"),
+    force: bool = typer.Option(False, "--force", help="Regenerate even if dataset already exists"),
 ) -> None:
-    """Generate a synthetic dataset for a domain (groq/gemini/ollama)."""
+    """Generate a synthetic dataset for a domain (groq/gemini/ollama).
+
+    Reuses existing dataset unless --force is passed.
+    Edit data/processed/{dominio}.jsonl manually before training if needed.
+    """
     from src.trainers.config_loader import load_config
 
     config = load_config(dominio, config_dir=CONFIG_DIR)
@@ -126,6 +143,15 @@ def dataset(
         config.generator = generator
 
     output_path = Path(output) if output else DATA_DIR / "processed" / f"{dominio}.jsonl"
+
+    if output_path.exists() and not force:
+        n_lines = sum(1 for _ in open(output_path))
+        console.print(
+            f"[green]Dataset already exists[/green]: {output_path} ({n_lines} examples)\n"
+            f"Use [bold]--force[/bold] to regenerate, or edit the file manually."
+        )
+        return
+
     _run_dataset(config, output_path)
 
 
