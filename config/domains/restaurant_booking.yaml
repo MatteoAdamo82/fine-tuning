@@ -19,3 +19,4 @@ export:
   gguf: true
   ollama: true
   ollama_model_name: agente-ristorante
+  hf_repo_id: mauto-1982/agente-ristorante

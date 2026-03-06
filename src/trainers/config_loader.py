@@ -116,6 +116,8 @@ def _apply_to_config(config: TrainingConfig, data: dict) -> None:
         flat["export_ollama"] = export_data["ollama"]
     if "ollama_model_name" in export_data:
         flat["ollama_model_name"] = export_data["ollama_model_name"]
+    if "hf_repo_id" in export_data:
+        flat["hf_repo_id"] = export_data["hf_repo_id"]
 
     # Top-level domain fields
     for k in ("domain", "lingua", "obiettivo"):

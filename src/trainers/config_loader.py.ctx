@@ -15,14 +15,16 @@ conceptualTests:
           load_config('restaurant_booking', 'qwen3_0_6b').
           Il file config/models/qwen3_0_6b.yaml ha: model.hf_id='Qwen/Qwen3-0.6B'
           e training.max_seq_length=512.
-          Il file config/domains/restaurant_booking.yaml ha: lingua='Italiano'
-          e training.max_seq_length=1024.
-          _apply_to_config() mappa model.hf_id -> config.hf_model_id (vedi riga 97-98 del codice).
+          Il file config/domains/restaurant_booking.yaml ha: lingua='Italiano',
+          training.max_seq_length=1024 e export.hf_repo_id='mauto-1982/agente-ristorante'.
+          _apply_to_config() mappa model.hf_id -> config.hf_model_id (vedi riga 97-98 del codice)
+          e export.hf_repo_id -> config.hf_repo_id (vedi riga 120-121).
           Il merge è base -> domain -> model: il model sovrascrive il domain.
         expect: >
           config.lingua == 'Italiano' (dal domain),
           config.max_seq_length == 512 (model sovrascrive domain),
-          config.hf_model_id == 'Qwen/Qwen3-0.6B' (da model.hf_id via _apply_to_config)
+          config.hf_model_id == 'Qwen/Qwen3-0.6B' (da model.hf_id via _apply_to_config),
+          config.hf_repo_id == 'mauto-1982/agente-ristorante' (da export.hf_repo_id)
   - name: "FORCE_CPU applicato"
     steps:
       - action: >

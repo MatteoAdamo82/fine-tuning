@@ -3,6 +3,9 @@ purpose: "Config dominio per agente prenotazioni ristorante in italiano."
 tensions:
   - "ollama_model_name in italiano: il modello Ollama viene registrato con nome
     italiano per chiarire il suo scopo. Non usare nomi generici tipo 'agent'."
+  - "hf_repo_id sotto export: è la fonte di verità per il namespace HuggingFace
+    del dominio. Il notebook legge questo campo automaticamente — evita hardcoding
+    di username nel notebook che genera namespace mismatch tra account diversi."
 
 conceptualTests:
   - name: "Dataset contiene happy path"
