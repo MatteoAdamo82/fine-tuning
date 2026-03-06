@@ -1,2 +1,6 @@
 # Files that don't need .ctx companions
 __init__.py
+
+# .env.ctx is a dotenv config file for ctx-run/ctx-watch Docker setup,
+# not a ContextDoc YAML companion — used as --env-file in docker compose
+.env.ctx
