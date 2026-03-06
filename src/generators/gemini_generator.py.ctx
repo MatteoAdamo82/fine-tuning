@@ -1,0 +1,17 @@
+purpose: "Chiama Gemini API in batch per generare dataset JSONL sintetici ChatML."
+
+tensions:
+  - "response_mime_type=application/json: Gemini ritorna JSON puro senza markdown.
+    Senza questo parametro Gemini wrappa la risposta in ```json``` e il parse fallisce."
+  - "generate_to_file usa batches invece di una singola chiamata: Gemini ha un
+    limite di output token (~8192). 50 conversazioni multi-turno saturano il limite.
+    3 batch da 50 = 150 esempi totali affidabili."
+  - "Il generatore non gestisce retry su errori Gemini: se una chiamata fallisce
+    il batch viene skippato. Il fallback è lanciare di nuovo forge dataset.
+    Aggiungere retry complicherebbe il flusso e nasconde errori di prompt."
+
+workflows:
+  generation: >
+    build_dataset_prompt -> genai.Client.models.generate_content ->
+    json.loads(response.text) -> validate_example per ogni item ->
+    scrive JSONL

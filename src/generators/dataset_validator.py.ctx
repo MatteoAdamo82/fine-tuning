@@ -1,0 +1,23 @@
+purpose: "Valida che ogni esempio JSONL rispetti il formato ChatML prima del training."
+
+tensions:
+  - "La validazione fallisce silenziosamente per esempio (skip), non per file:
+    un esempio invalido non blocca il dataset. Questo è intenzionale perché
+    Gemini a volte genera 1-2 esempi malformati su 50. Bloccare tutto il batch
+    per un esempio è peggio che skipparli."
+  - "Controllo che l'ultimo messaggio sia assistant: garantisce che il training
+    non stia su una conversazione troncata dove l'utente ha l'ultima parola."
+
+conceptualTests:
+  - name: "Esempio valido passa"
+    steps:
+      - action: "validate_example con system+user+assistant"
+        expect: "(True, None)"
+  - name: "Esempio senza system fallisce"
+    steps:
+      - action: "validate_example con solo user+assistant"
+        expect: "(False, 'First message must have role=system')"
+  - name: "Esempio con role collision fallisce"
+    steps:
+      - action: "validate_example con user+user"
+        expect: "(False, messaggio che indica role collision)"

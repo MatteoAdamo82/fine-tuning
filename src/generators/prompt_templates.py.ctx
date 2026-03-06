@@ -1,0 +1,13 @@
+purpose: "Costruisce i prompt parametrici inviati a Gemini per generare dataset JSONL."
+
+tensions:
+  - "Il system message nelle conversazioni generate deve essere consistente:
+    tutti gli esempi di un dominio devono avere lo stesso system prompt
+    (o varianti minime). Se variano troppo, il modello fine-tunato impara
+    a ignorare il system prompt invece di seguirlo."
+  - "response_mime_type=application/json in gemini_generator garantisce JSON
+    puro. Il system prompt dice 'senza markdown' come doppia protezione:
+    alcuni modelli ignorano il mime_type e aggiungono ```json```."
+
+workflows:
+  build_prompt: "config dominio -> build_dataset_prompt -> (system_prompt, user_prompt)"
