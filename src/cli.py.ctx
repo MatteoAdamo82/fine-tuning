@@ -1,0 +1,25 @@
+purpose: "Entry point CLI Typer. Orchestrata la pipeline (dataset → training → export)."
+
+tensions:
+  - "Import lazy dei moduli dentro i comandi: transformers e torch hanno
+    import time elevato (~3-5 secondi). Se importati a livello modulo,
+    anche 'forge list-domains' impiegherebbe secondi. Gli import lazy
+    rendono i comandi leggeri veloce."
+  - "_model_key_from_hf_id è un mapping hardcoded: sembra fragile ma
+    evita di scansionare config/models/ a ogni chiamata. Aggiungere un
+    nuovo modello richiede solo di aggiungere la entry al dict."
+
+workflows:
+  run_pipeline: >
+    typer parse args -> load_config -> _run_dataset ->
+    _run_training -> _run_export
+
+conceptualTests:
+  - name: "forge list-domains mostra i domini"
+    steps:
+      - action: "forge list-domains"
+        expect: "tabella con restaurant_booking, sales_agent, professional_booking"
+  - name: "forge run con skip flags"
+    steps:
+      - action: "forge run --dominio restaurant_booking --skip-dataset --skip-training"
+        expect: "solo export viene eseguito"
