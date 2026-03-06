@@ -1,0 +1,6 @@
+purpose: "Setup script: crea virtualenv, installa dipendenze, crea .env e directories."
+
+tensions:
+  - "pip install --quiet nasconde output: intenzionale per ridurre rumore.
+    Se l'installazione fallisce, pip stampa comunque gli errori (--quiet
+    non sopprime gli errori, solo il progresso normale)."

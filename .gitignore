@@ -16,12 +16,13 @@ build/
 .mypy_cache/
 .pytest_cache/
 
-# Data e output (potenzialmente grandi)
-data/raw/
-data/processed/
-outputs/checkpoints/
-outputs/models/
-logs/
+# Data e output (potenzialmente grandi) — traccia la dir, ignora il contenuto
+data/raw/*
+data/processed/*
+outputs/checkpoints/*
+outputs/models/*
+logs/*
+!**/.gitkeep
 
 # HuggingFace cache
 .cache/
