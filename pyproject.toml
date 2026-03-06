@@ -1,0 +1,52 @@
+[project]
+name = "fine-tune-forge"
+version = "0.1.0"
+description = "Demo pipeline for QLoRA fine-tuning of small LLMs on single-vertical tasks"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+dependencies = [
+    # Core training stack
+    "transformers>=4.47.0",
+    "datasets>=3.0.0",
+    "peft>=0.14.0",
+    "trl>=0.12.0",
+    "accelerate>=1.0.0",
+    # Quantization (4-bit QLoRA)
+    "bitsandbytes>=0.43.0",
+    # Dataset generation
+    "google-genai>=1.0.0",
+    # HuggingFace Hub
+    "huggingface-hub>=0.26.0",
+    # Config and validation
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0.0",
+    "python-dotenv>=1.0.0",
+    # CLI
+    "rich>=13.0.0",
+    "typer>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+]
+
+[project.scripts]
+forge = "src.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

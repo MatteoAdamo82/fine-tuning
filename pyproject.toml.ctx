@@ -1,0 +1,12 @@
+purpose: "Definisce il progetto Python, le dipendenze e l'entry point CLI forge."
+
+tensions:
+  - "bitsandbytes è richiesta anche se FORCE_CPU=true: la libreria gestisce
+    il fallback su CPU internamente. Rimuoverla romperebbe l'import anche
+    in ambiente CPU-only."
+  - "google-genai e non google-generativeai: il pacchetto legacy è deprecato
+    dal 2024. Il nuovo SDK ha API diversa (genai.Client vs genai.configure)."
+
+todos:
+  - Aggiungere torch come dipendenza opzionale con extra [gpu] e [cpu]
+  - Valutare flash-attn per training più veloce su GPU compatibili

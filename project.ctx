@@ -1,0 +1,63 @@
+purpose: >
+  fine-tune-forge è una demo pipeline per il fine-tuning di piccoli LLM (1B–7B)
+  su task verticali singoli (prenotazioni, vendite) usando QLoRA, dataset sintetici
+  generati da Gemini e CLI Typer per l'orchestrazione. Progetto open-source
+  realizzato con il paradigma OpenDoc/ContextDoc.
+
+tensions:
+  - "gemini_generates_data_not_code: Gemini genera solo dataset JSONL a runtime,
+    MAI il codice di training. L'infrastruttura training è statica e auditabile.
+    Aspetto: perché non far generare tutto a Gemini? Risposta: codice AI-generated
+    non è deterministico e non può essere revisionato."
+  - "cli_over_api: orchestrazione tramite Typer CLI, non HTTP server. Sembra
+    limitante ma riduce drasticamente la complessità: nessun job manager, nessun
+    polling, nessuna dipendenza da n8n o FastAPI."
+  - "no_validation_split_sotto_200_esempi: dataset < 200 esempi usa tutto per
+    training senza eval split. Sembra un errore ML ma è intenzionale: per task
+    verticali stretti, l'overfitting è accettabile e ogni esempio conta."
+  - "single_file_per_domain_config: i parametri dataset E quelli training stanno
+    nello stesso file YAML di dominio. Viola SoC ma evita config drift tra
+    generazione e training che sono strettamente accoppiati per task."
+  - "chatml_only: solo formato ChatML (messages array). Nessun supporto Alpaca
+    o ShareGPT. Sembra rigido ma garantisce compatibilità con tutti i modelli
+    Qwen3/Llama3/Phi3 e con il chat template di HuggingFace."
+
+workflows:
+  full_pipeline: >
+    forge run --dominio X --modello Y ->
+    config_loader carica YAML dominio+modello ->
+    gemini_generator chiama Gemini API a batch ->
+    dataset_validator valida ChatML ->
+    qlora_trainer avvia SFTTrainer con QLoRA ->
+    exporter converte in GGUF/Ollama/HF
+
+  dataset_only: >
+    forge dataset --dominio X ->
+    prompt_templates costruisce system+user prompt ->
+    gemini_generator chiama Gemini con response_mime_type=json ->
+    salva JSONL in data/processed/
+
+conceptualTests:
+  - name: "Pipeline completa con CPU"
+    steps:
+      - action: "FORCE_CPU=true forge run --dominio restaurant_booking --modello qwen3_0_6b"
+        expect: "JSONL generato, training avviato, checkpoint salvato in outputs/"
+  - name: "Dataset generation standalone"
+    steps:
+      - action: "forge dataset --dominio sales_agent"
+        expect: "file JSONL in data/processed/ con almeno 50 esempi ChatML validi"
+  - name: "Export GGUF dopo training"
+    steps:
+      - action: "forge export --checkpoint outputs/checkpoints/run-xyz/ --format gguf"
+        expect: "model.gguf presente in outputs/models/run-xyz/"
+
+todos:
+  - Aggiungere supporto DPO come alternativa a SFT
+  - Stimare VRAM prima del training per fail-fast su hardware insufficiente
+  - Aggiungere deduplicazione dataset nel validator
+
+ref:
+  - https://github.com/huggingface/trl
+  - https://ai.google.dev/gemini-api/docs
+  - https://github.com/ggerganov/llama.cpp
+  - https://github.com/MatteoAdamo82/contextdoc

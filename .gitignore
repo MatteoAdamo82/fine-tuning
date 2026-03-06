@@ -1,0 +1,34 @@
+# Environment
+.env
+.env.ctx
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Data e output (potenzialmente grandi)
+data/raw/
+data/processed/
+outputs/checkpoints/
+outputs/models/
+logs/
+
+# HuggingFace cache
+.cache/
+
+# ctx-run cache
+.ctx-cache/
+
+# OS
+.DS_Store
+Thumbs.db
