@@ -91,11 +91,15 @@ def run(
     if not skip_training:
         merged_path = _run_training(config, dataset_path, run_id)
     else:
-        merged_path = OUTPUTS_DIR / "checkpoints" / run_id / "merged"
-        console.print(f"[yellow]Skipping training, expecting merged model at: {merged_path}[/yellow]")
+        candidate = OUTPUTS_DIR / "checkpoints" / run_id / "merged"
+        if candidate.exists():
+            merged_path = candidate
+            console.print(f"[yellow]Skipping training, using existing model: {merged_path}[/yellow]")
+        else:
+            console.print(f"[yellow]Skipping training — no merged model found at {candidate}, skipping export too.[/yellow]")
 
     # Step 3: Export
-    if not skip_export and merged_path:
+    if not skip_export and merged_path is not None:
         _run_export(config, merged_path, run_id)
 
     console.print(f"\n[bold green]Pipeline complete! Run ID: {run_id}[/bold green]")

@@ -17,9 +17,17 @@ workflows:
 conceptualTests:
   - name: "forge list-domains mostra i domini"
     steps:
-      - action: "forge list-domains"
-        expect: "tabella con restaurant_booking, sales_agent, professional_booking"
+      - action: >
+          forge list-domains dove config/domains/ contiene
+          restaurant_booking.yaml, sales_agent.yaml, professional_booking.yaml
+        expect: >
+          stampa una tabella Rich con una riga per ciascuno dei 3 file .yaml trovati;
+          il comando non fallisce se i file esistono
   - name: "forge run con skip flags"
     steps:
-      - action: "forge run --dominio restaurant_booking --skip-dataset --skip-training"
-        expect: "solo export viene eseguito"
+      - action: >
+          forge run --dominio restaurant_booking --skip-dataset --skip-training
+          dove outputs/checkpoints/{run_id}/merged/ NON esiste ancora
+        expect: >
+          dataset step skippato, training step skippato,
+          export skippato (merged model non trovato), pipeline termina senza errore

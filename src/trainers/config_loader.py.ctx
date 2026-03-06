@@ -12,17 +12,22 @@ conceptualTests:
   - name: "Config merged correttamente"
     steps:
       - action: >
-          load_config('restaurant_booking', 'qwen3_0_6b') dove:
-          config/models/qwen3_0_6b.yaml esiste e contiene training.max_seq_length=512,
-          config/domains/restaurant_booking.yaml contiene training.max_seq_length=1024.
+          load_config('restaurant_booking', 'qwen3_0_6b').
+          Il file config/models/qwen3_0_6b.yaml ha: model.hf_id='Qwen/Qwen3-0.6B'
+          e training.max_seq_length=512.
+          Il file config/domains/restaurant_booking.yaml ha: lingua='Italiano'
+          e training.max_seq_length=1024.
+          _apply_to_config() mappa model.hf_id -> config.hf_model_id (vedi riga 97-98 del codice).
           Il merge è base -> domain -> model: il model sovrascrive il domain.
         expect: >
-          config.hf_model_id == 'Qwen/Qwen3-0.6B' (da model.hf_id),
           config.lingua == 'Italiano' (dal domain),
-          config.max_seq_length == 512 (model sovrascrive domain che ha 1024)
+          config.max_seq_length == 512 (model sovrascrive domain),
+          config.hf_model_id == 'Qwen/Qwen3-0.6B' (da model.hf_id via _apply_to_config)
   - name: "FORCE_CPU applicato"
     steps:
-      - action: "FORCE_CPU=true load_config('restaurant_booking')"
+      - action: >
+          Impostare env var FORCE_CPU=true, poi chiamare load_config('restaurant_booking').
+          Il codice legge os.environ.get('FORCE_CPU') e confronta con ('true','1','yes').
         expect: "config.force_cpu == True"
 
 ref:
