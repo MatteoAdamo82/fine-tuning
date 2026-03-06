@@ -28,13 +28,20 @@ from src.trainers.config_loader import TrainingConfig
 console = Console()
 
 
-def _get_bnb_config(force_cpu: bool) -> BitsAndBytesConfig | None:
-    """Returns 4-bit quantization config, or None for CPU training."""
+def _get_bnb_config(force_cpu: bool, use_bf16: bool = False) -> BitsAndBytesConfig | None:
+    """Returns 4-bit quantization config, or None for CPU training.
+
+    bnb_4bit_compute_dtype must match the AMP dtype chosen for training:
+    - bf16 on Ampere+ (A100, H100, RTX 30xx/40xx) — no GradScaler needed
+    - fp16 on older GPUs (T4, V100) — GradScaler handles overflow
+    Mixing the two causes NotImplementedError during gradient unscaling.
+    """
     if force_cpu or not torch.cuda.is_available():
         return None
+    compute_dtype = torch.bfloat16 if use_bf16 else torch.float16
     return BitsAndBytesConfig(
         load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_compute_dtype=compute_dtype,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_use_double_quant=True,
     )
@@ -69,8 +76,15 @@ def run_training(
 
     if force_cpu:
         console.print("[yellow]FORCE_CPU mode: training on CPU (slow)[/yellow]")
+        use_bf16 = False
+        use_fp16 = False
     else:
-        console.print(f"[green]GPU detected: {torch.cuda.get_device_name(0)}[/green]")
+        # Detect bf16 support (Ampere+: A100, H100, RTX30xx/40xx)
+        # T4/V100 support fp16 only — mixing dtypes crashes AMP GradScaler
+        use_bf16 = torch.cuda.is_bf16_supported()
+        use_fp16 = not use_bf16
+        precision = "bf16 (Ampere+)" if use_bf16 else "fp16 (T4/V100)"
+        console.print(f"[green]GPU detected: {torch.cuda.get_device_name(0)} — {precision}[/green]")
 
     # Load tokenizer
     console.print(f"Loading tokenizer: {config.hf_model_id}")
@@ -87,7 +101,7 @@ def run_training(
 
     # Load model
     console.print(f"Loading model: {config.hf_model_id}")
-    bnb_config = _get_bnb_config(force_cpu)
+    bnb_config = _get_bnb_config(force_cpu, use_bf16=use_bf16)
     model_kwargs: dict = {
         "trust_remote_code": True,
         "token": os.environ.get("HF_TOKEN"),
@@ -132,8 +146,8 @@ def run_training(
         save_steps=config.save_steps,
         logging_steps=config.logging_steps,
         save_total_limit=2,
-        fp16=not force_cpu and torch.cuda.is_available(),
-        bf16=False,
+        fp16=use_fp16,
+        bf16=use_bf16,
         dataloader_num_workers=0,
         report_to="none",
     )
