@@ -1,11 +1,14 @@
-purpose: "Config per Qwen/Qwen3.5-0.8B. Modello demo: VLM usato text-only."
+purpose: "Config per Qwen/Qwen3.5-0.8B. Modello demo: già instruction-tuned, VLM usato text-only."
 
 tensions:
+  - "Qwen3.5-0.8B è già instruction-tuned: in Qwen3.5 non esiste una variante
+    separata 'Instruct'. Il modello base non allineato è Qwen3.5-0.8B-Base.
+    Usare sempre Qwen3.5-0.8B (senza -Base) per il fine-tuning su chat tasks."
   - "model_class=AutoModelForImageTextToText: Qwen3.5 è multimodale ma supporta
     inference text-only. Il trainer usa questa classe invece di AutoModelForCausalLM.
     Per task di prenotazione/vendita si usa solo il testo, le immagini vengono ignorate."
-  - "ollama_tag=qwen3.5:0.8b potrebbe non esistere localmente: l'utente ha
-    qwen3.5:4b e qwen3.5:9b. Il tag 0.8b va pullato con 'ollama pull qwen3.5:0.8b'."
+  - "ollama_tag=qwen3.5:0.8b potrebbe non esistere localmente: pullare con
+    'ollama pull qwen3.5:0.8b'. Alternativa locale disponibile: qwen3.5:4b."
 
 ref:
   - https://huggingface.co/Qwen/Qwen3.5-0.8B
