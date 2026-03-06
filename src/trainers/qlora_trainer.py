@@ -118,6 +118,7 @@ def run_training(
     console.print(f"Dataset size: {len(dataset)} examples")
 
     # Training arguments
+    # Note: max_seq_length moved from SFTConfig to SFTTrainer in TRL >= 0.12
     training_args = SFTConfig(
         output_dir=str(output_dir),
         num_train_epochs=config.epochs,
@@ -133,7 +134,6 @@ def run_training(
         bf16=False,
         dataloader_num_workers=0,
         report_to="none",
-        max_seq_length=config.max_seq_length,
     )
 
     # SFTTrainer handles ChatML formatting via tokenizer.apply_chat_template
@@ -143,6 +143,7 @@ def run_training(
         train_dataset=dataset,
         peft_config=lora_config,
         processing_class=tokenizer,
+        max_seq_length=config.max_seq_length,
     )
 
     console.print("[bold]Starting training...[/bold]")
