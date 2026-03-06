@@ -14,8 +14,8 @@ Crea modelli AI ultra-specializzati (agente prenotazioni ristorante, agente vend
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  forge run   │────▶│   Gemini API  │────▶│ QLoRA Train  │────▶│    Export    │
-│  (CLI input) │     │ (JSONL gen)   │     │ (HF/PEFT/TRL)│     │ GGUF/Ollama  │
+│  forge run   │────▶│ Gemini API   │────▶│ QLoRA Train  │────▶│    Export    │
+│  (CLI input) │     │ (JSONL gen)  │     │ (HF/PEFT/TRL)│     │ GGUF/Ollama  │
 └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
 ```
 
@@ -48,7 +48,7 @@ forge list-domains
 ```bash
 forge run \
   --obiettivo "agente prenotazioni ristorante" \
-  --modello "Qwen/Qwen3-0.6B" \
+  --modello "Qwen/Qwen3.5-0.8B" \
   --lingua italiano \
   --dominio restaurant_booking
 ```
@@ -65,7 +65,7 @@ forge dataset --dominio restaurant_booking --output data/raw/
 forge train \
   --dataset data/processed/restaurant_booking.jsonl \
   --dominio restaurant_booking \
-  --modello "Qwen/Qwen3-0.6B"
+  --modello "Qwen/Qwen3.5-0.8B"
 ```
 
 ### Export modello
@@ -92,7 +92,7 @@ forge list-domains
 ```bash
 FORCE_CPU=true forge run \
   --obiettivo "agente prenotazioni ristorante" \
-  --modello "Qwen/Qwen3-0.6B" \
+  --modello "Qwen/Qwen3.5-0.8B" \
   --lingua italiano \
   --dominio restaurant_booking
 ```
@@ -101,7 +101,7 @@ FORCE_CPU=true forge run \
 
 | Modello HuggingFace | Ollama tag | VRAM richiesta | Note |
 |---------------------|------------|----------------|------|
-| Qwen/Qwen3-0.6B | qwen3:0.6b | ~2GB | Demo/test |
+| Qwen/Qwen3.5-0.8B | qwen3.5:0.8b | ~2GB | Demo/test (VLM text-only) |
 | Qwen/Qwen3-4B | qwen3:4b | ~6GB | Bilanciato |
 | Qwen/Qwen3-8B | qwen3:8b | ~10GB | Alta qualità |
 

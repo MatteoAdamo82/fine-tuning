@@ -15,6 +15,8 @@ from peft import LoraConfig, TaskType, get_peft_model
 from rich.console import Console
 from transformers import (
     AutoModelForCausalLM,
+    AutoModelForImageTextToText,
+    AutoProcessor,
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
@@ -93,7 +95,12 @@ def run_training(
     else:
         model_kwargs["torch_dtype"] = torch.float32
 
-    model = AutoModelForCausalLM.from_pretrained(config.hf_model_id, **model_kwargs)
+    # Use AutoModelForImageTextToText for VLM architectures (e.g. qwen3_5)
+    is_vlm = getattr(config, "model_class", "") == "AutoModelForImageTextToText"
+    if is_vlm:
+        model = AutoModelForImageTextToText.from_pretrained(config.hf_model_id, **model_kwargs)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(config.hf_model_id, **model_kwargs)
 
     # LoRA config
     lora_config = LoraConfig(

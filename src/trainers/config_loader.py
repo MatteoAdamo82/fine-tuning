@@ -17,9 +17,10 @@ import yaml
 @dataclass
 class TrainingConfig:
     # Model
-    hf_model_id: str = "Qwen/Qwen3-0.6B"
-    ollama_tag: str = "qwen3:0.6b"
-    architecture: str = "qwen3"
+    hf_model_id: str = "Qwen/Qwen3.5-0.8B"
+    ollama_tag: str = "qwen3.5:0.8b"
+    architecture: str = "qwen3_5"
+    model_class: str = "AutoModelForImageTextToText"
 
     # Domain / dataset
     domain: str = ""
@@ -99,6 +100,8 @@ def _apply_to_config(config: TrainingConfig, data: dict) -> None:
         flat["ollama_tag"] = model_data["ollama_tag"]
     if "architecture" in model_data:
         flat["architecture"] = model_data["architecture"]
+    if "model_class" in model_data:
+        flat["model_class"] = model_data["model_class"]
 
     # Flatten export: subtree
     export_data = data.get("export", {})

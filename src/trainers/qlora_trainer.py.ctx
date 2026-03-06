@@ -14,6 +14,10 @@ tensions:
   - "pad_token = eos_token se mancante: Qwen3 e altri modelli non hanno un
     pad token separato. Senza questa riga il training crasherebbe su batch
     con sequenze di lunghezza diversa."
+  - "AutoModelForImageTextToText per architettura qwen3_5: Qwen3.5-0.8B è
+    un VLM (vision-language model) ma viene usato text-only. Il trainer
+    sceglie la classe giusta in base a config.model_class. Per architetture
+    standard (qwen3, llama, phi) usa AutoModelForCausalLM."
 
 workflows:
   training: >

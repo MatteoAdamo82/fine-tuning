@@ -39,6 +39,7 @@ OUTPUTS_DIR = Path("outputs")
 def _model_key_from_hf_id(hf_model_id: str) -> str | None:
     """Tries to find a matching model config key from the HF model ID."""
     mapping = {
+        "Qwen/Qwen3.5-0.8B": "qwen3_5_0_8b",
         "Qwen/Qwen3-0.6B": "qwen3_0_6b",
         "Qwen/Qwen3-4B": "qwen3_4b",
     }
@@ -48,7 +49,7 @@ def _model_key_from_hf_id(hf_model_id: str) -> str | None:
 @app.command()
 def run(
     dominio: str = typer.Option(..., "--dominio", "-d", help="Domain config key (e.g. restaurant_booking)"),
-    modello: str = typer.Option("Qwen/Qwen3-0.6B", "--modello", "-m", help="HuggingFace model ID"),
+    modello: str = typer.Option("Qwen/Qwen3.5-0.8B", "--modello", "-m", help="HuggingFace model ID"),
     obiettivo: Optional[str] = typer.Option(None, "--obiettivo", help="Override domain obiettivo"),
     lingua: Optional[str] = typer.Option(None, "--lingua", help="Override domain lingua"),
     run_id: Optional[str] = typer.Option(None, "--run-id", help="Custom run identifier"),
@@ -122,7 +123,7 @@ def dataset(
 def train(
     dataset_path: str = typer.Argument(..., help="Path to the JSONL dataset"),
     dominio: str = typer.Option(..., "--dominio", "-d", help="Domain config key"),
-    modello: str = typer.Option("Qwen/Qwen3-0.6B", "--modello", "-m", help="HuggingFace model ID"),
+    modello: str = typer.Option("Qwen/Qwen3.5-0.8B", "--modello", "-m", help="HuggingFace model ID"),
     run_id: Optional[str] = typer.Option(None, "--run-id", help="Custom run identifier"),
 ) -> None:
     """Run QLoRA training on an existing dataset."""
