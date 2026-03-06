@@ -1,0 +1,26 @@
+purpose: >
+  Factory function per istanziare il dataset generator corretto dato il tipo
+  stringa (groq/gemini/ollama). Isola cli.py dalla conoscenza delle classi
+  concrete — aggiungere un nuovo provider richiede solo questo file.
+
+tensions:
+  - name: lazy_imports
+    description: >
+      I generator sono importati dentro la funzione (non a top-level) per
+      evitare ImportError se le dipendenze opzionali non sono installate
+      (es. groq package). L'utente vede l'errore solo se usa quel provider.
+
+workflows:
+  - name: aggiungere_nuovo_provider
+    steps:
+      - Crea src/generators/nuovo_generator.py + .ctx
+      - Aggiungi elif gt == "nuovo" in factory.py
+      - Aggiungi a _SUPPORTED
+      - Aggiorna config/base.yaml con eventuali nuovi campi model
+      - Aggiorna TrainingConfig in config_loader.py
+
+conceptualTests:
+  - scenario: tipo sconosciuto solleva ValueError
+    given: generator_type = "openai"
+    when: create_generator è chiamato
+    then: solleva ValueError con lista dei tipi supportati

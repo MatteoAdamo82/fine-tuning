@@ -1,0 +1,33 @@
+purpose: >
+  Generates synthetic ChatML datasets via Groq API (Llama 3.3 70B).
+  Default generator — free tier con 14.400 req/day e latenza ~2s/batch
+  vs i 30–120s di attesa di Gemini free tier per i 429.
+
+tensions:
+  - name: json_object_mode
+    description: >
+      Groq response_format=json_object richiede un JSON object, non array bare.
+      Usiamo wrap_in_object=True nel prompt + _parse_and_validate() per unwrap.
+
+  - name: temperature_vs_diversity
+    description: >
+      temperature=1.0 (default) dà buona varietà ma aumenta il rischio di JSON
+      malformato. Se troppi esempi vengono skippati, abbassare a 0.8.
+
+workflows:
+  - name: rate_limit_handling
+    steps:
+      - Groq ritorna HTTP 429 se si supera il rate limit
+      - _call_with_retry aspetta 15s, poi raddoppia (cap 120s)
+      - Inter-batch pause = 3s (vs 10s Gemini) — Groq è più permissivo
+
+conceptualTests:
+  - scenario: Groq 429 triggera retry
+    given: Groq ritorna status_code=429 al primo tentativo
+    when: _call_with_retry è chiamato con max_retries=5
+    then: attende 15s e riprova, senza propagare l'eccezione al primo tentativo
+
+  - scenario: GROQ_API_KEY mancante solleva ValueError
+    given: GROQ_API_KEY non è in os.environ
+    when: GroqDatasetGenerator() è istanziato
+    then: solleva ValueError con messaggio che indica la variabile mancante

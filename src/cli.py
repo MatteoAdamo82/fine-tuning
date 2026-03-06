@@ -53,6 +53,7 @@ def run(
     obiettivo: Optional[str] = typer.Option(None, "--obiettivo", help="Override domain obiettivo"),
     lingua: Optional[str] = typer.Option(None, "--lingua", help="Override domain lingua"),
     run_id: Optional[str] = typer.Option(None, "--run-id", help="Custom run identifier"),
+    generator: Optional[str] = typer.Option(None, "--generator", "-g", help="Generator: groq, gemini, ollama (overrides config)"),
     skip_dataset: bool = typer.Option(False, "--skip-dataset", help="Skip dataset generation (use existing)"),
     skip_training: bool = typer.Option(False, "--skip-training", help="Skip training"),
     skip_export: bool = typer.Option(False, "--skip-export", help="Skip export"),
@@ -68,6 +69,8 @@ def run(
         overrides["obiettivo"] = obiettivo
     if lingua:
         overrides["lingua"] = lingua
+    if generator:
+        overrides["generator"] = generator
     overrides["hf_model_id"] = modello
 
     config = load_config(dominio, model_key=model_key, config_dir=CONFIG_DIR, overrides=overrides)
@@ -111,14 +114,16 @@ def dataset(
     dominio: str = typer.Option(..., "--dominio", "-d", help="Domain config key"),
     output: Optional[str] = typer.Option(None, "--output", help="Output JSONL path"),
     n_examples: Optional[int] = typer.Option(None, "--n-examples", help="Number of examples to generate"),
+    generator: Optional[str] = typer.Option(None, "--generator", "-g", help="Generator: groq, gemini, ollama (overrides config)"),
 ) -> None:
-    """Generate a synthetic dataset for a domain using Gemini API."""
+    """Generate a synthetic dataset for a domain (groq/gemini/ollama)."""
     from src.trainers.config_loader import load_config
-    from src.generators.gemini_generator import GeminiDatasetGenerator
 
     config = load_config(dominio, config_dir=CONFIG_DIR)
     if n_examples:
         config.n_examples = n_examples
+    if generator:
+        config.generator = generator
 
     output_path = Path(output) if output else DATA_DIR / "processed" / f"{dominio}.jsonl"
     _run_dataset(config, output_path)
@@ -215,10 +220,19 @@ def list_domains() -> None:
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def _run_dataset(config, output_path: Path) -> None:
-    from src.generators.gemini_generator import GeminiDatasetGenerator
+    from src.generators.factory import create_generator
+
+    generator_type = getattr(config, "generator", "groq")
+    # Pick the right model for the selected generator
+    model_for_generator = {
+        "groq": getattr(config, "groq_model", None),
+        "gemini": getattr(config, "gemini_model", None),
+        "ollama": getattr(config, "ollama_generator_model", None),
+    }.get(generator_type)
 
     console.print(f"\n[bold]Step 1: Dataset generation[/bold] → {output_path}")
-    gen = GeminiDatasetGenerator(model=config.gemini_model)
+    console.print(f"Generator: [cyan]{generator_type}[/cyan]")
+    gen = create_generator(generator_type, model=model_for_generator)
     _, total = gen.generate_to_file(
         output_path=output_path,
         obiettivo=config.obiettivo,

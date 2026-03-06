@@ -12,27 +12,52 @@ def build_dataset_prompt(
     lingua: str,
     dominio: str,
     n_examples: int,
+    wrap_in_object: bool = False,
 ) -> tuple[str, str]:
     """
-    Returns (system_prompt, user_prompt) for the Gemini API call.
+    Returns (system_prompt, user_prompt) for the LLM API call.
 
     The system prompt sets quality constraints and output format.
     The user prompt provides task-specific parameters.
+
+    Args:
+        wrap_in_object: if True, asks for {"examples": [...]} instead of a bare
+            array. Required for APIs that enforce JSON object mode (Groq, Ollama).
     """
+    if wrap_in_object:
+        format_instruction = (
+            'Rispondi SOLO con un JSON object valido, senza markdown, senza spiegazioni:\n'
+            '{{\n'
+            '  "examples": [\n'
+            '    {{\n'
+            '      "messages": [\n'
+            '        {{"role": "system", "content": "..."}},\n'
+            '        {{"role": "user", "content": "..."}},\n'
+            '        {{"role": "assistant", "content": "..."}}\n'
+            '      ]\n'
+            '    }}\n'
+            '  ]\n'
+            '}}'
+        )
+    else:
+        format_instruction = (
+            'Rispondi SOLO con un JSON array valido, senza markdown, senza spiegazioni:\n'
+            '[\n'
+            '  {{\n'
+            '    "messages": [\n'
+            '      {{"role": "system", "content": "..."}},\n'
+            '      {{"role": "user", "content": "..."}},\n'
+            '      {{"role": "assistant", "content": "..."}}\n'
+            '    ]\n'
+            '  }}\n'
+            ']'
+        )
+
     system_prompt = f"""Sei un esperto generatore di dati sintetici per il fine-tuning di LLM.
 
 Il tuo compito è generare conversazioni di addestramento realistiche e diversificate.
 
-FORMATO OBBLIGATORIO - Rispondi SOLO con un JSON array valido, senza markdown, senza spiegazioni:
-[
-  {{
-    "messages": [
-      {{"role": "system", "content": "..."}},
-      {{"role": "user", "content": "..."}},
-      {{"role": "assistant", "content": "..."}}
-    ]
-  }}
-]
+FORMATO OBBLIGATORIO - {format_instruction}
 
 REGOLE QUALITÀ:
 1. Ogni conversazione deve iniziare con 1 system message, poi alternare user/assistant

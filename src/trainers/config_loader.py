@@ -28,7 +28,10 @@ class TrainingConfig:
     obiettivo: str = ""
     n_examples: int = 150
     batches: int = 3
+    generator: str = "groq"
+    groq_model: str = "llama-3.3-70b-versatile"
     gemini_model: str = "gemini-2.0-flash"
+    ollama_generator_model: str = "qwen3:4b"
     temperature: float = 1.0
 
     # Training hyperparams

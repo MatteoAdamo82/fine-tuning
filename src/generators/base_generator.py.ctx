@@ -1,0 +1,37 @@
+purpose: >
+  Abstract base class for all dataset generators.
+  Centralises generate_to_file() (batching + JSONL write + progress) and
+  _parse_and_validate() (JSON unwrap + ChatML validation) so subclasses
+  implement only generate_batch().
+
+tensions:
+  - name: wrap_in_object_compatibility
+    description: >
+      Gemini supports bare JSON arrays; Groq and Ollama JSON modes require
+      an object. _parse_and_validate handles both shapes transparently so
+      subclasses don't need to care about wrapping.
+
+  - name: no_streaming
+    description: >
+      generate_batch() must return the complete batch before validation runs.
+      Streaming responses would require buffering the full text anyway, adding
+      complexity with no benefit for our use case.
+
+workflows:
+  - name: add_new_generator
+    steps:
+      - Subclass BaseDatasetGenerator
+      - Implement generate_batch() — call LLM, return _parse_and_validate(raw_text)
+      - Set inter_batch_pause if the provider has rate limits
+      - Register in factory.py
+
+conceptualTests:
+  - scenario: generate_to_file chiama generate_batch N volte
+    given: batches=3, n_examples=30
+    when: generate_to_file è chiamato
+    then: generate_batch è invocato 3 volte con n_examples=10 ciascuno
+
+  - scenario: _parse_and_validate gestisce wrapper object
+    given: raw_text = '{"examples": [{"messages": [...]}]}'
+    when: _parse_and_validate è chiamato
+    then: ritorna la lista di esempi validi senza il wrapper

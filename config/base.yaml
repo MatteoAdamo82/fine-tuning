@@ -20,7 +20,11 @@ training:
 dataset:
   n_examples: 150
   batches: 3
+  # generator: groq (default) | gemini | ollama
+  generator: groq
+  groq_model: llama-3.3-70b-versatile
   gemini_model: gemini-2.0-flash
+  ollama_generator_model: qwen3:4b
   temperature: 1.0
 
 export:

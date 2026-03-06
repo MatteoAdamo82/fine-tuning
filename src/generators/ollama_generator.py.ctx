@@ -1,0 +1,40 @@
+purpose: >
+  Generates synthetic ChatML datasets via local Ollama instance.
+  Zero rate limits, zero API costs. Richiede Ollama in esecuzione locale.
+  Usa urllib stdlib — nessuna dipendenza aggiuntiva oltre Python.
+
+tensions:
+  - name: slow_local_inference
+    description: >
+      Inferenza locale è più lenta di Groq (specie senza GPU dedicata).
+      inter_batch_pause=0.5s — non serve aspettare per rate limits.
+      Timeout chiamata = 600s per batch grandi su hardware lento.
+
+  - name: json_object_mode
+    description: >
+      Ollama format="json" richiede JSON object. Come Groq, usiamo
+      wrap_in_object=True e _parse_and_validate() per unwrap.
+
+  - name: model_quality_tradeoff
+    description: >
+      qwen3:4b (default) bilancia qualità e velocità locale.
+      Modelli più piccoli (qwen3:0.6b) generano dati meno vari.
+      Override via OLLAMA_GENERATOR_MODEL env var.
+
+workflows:
+  - name: connection_check
+    steps:
+      - __init__ chiama _check_connection() via GET /api/tags
+      - Se Ollama non è raggiungibile, solleva ConnectionError subito
+      - Messaggio include OLLAMA_BASE_URL e suggerisce 'ollama serve'
+
+conceptualTests:
+  - scenario: Ollama non raggiungibile solleva ConnectionError
+    given: OLLAMA_BASE_URL punta a un server inesistente
+    when: OllamaDatasetGenerator() è istanziato
+    then: solleva ConnectionError con suggerimento 'ollama serve'
+
+  - scenario: Risposta Ollama in formato object viene unwrappata
+    given: Ollama ritorna '{"examples": [{"messages": [...]}]}'
+    when: generate_batch è chiamato
+    then: ritorna lista di esempi validi senza wrapper

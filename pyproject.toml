@@ -16,6 +16,7 @@ dependencies = [
     # Quantization (4-bit QLoRA)
     "bitsandbytes>=0.43.0",
     # Dataset generation
+    "groq>=0.13.0",
     "google-genai>=1.0.0",
     # HuggingFace Hub
     "huggingface-hub>=0.26.0",
