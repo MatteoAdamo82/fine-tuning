@@ -1,0 +1,21 @@
+domain: restaurant_booking
+lingua: Italiano
+
+dataset:
+  n_examples: 150
+  batches: 3
+  obiettivo: >
+    Agente di prenotazione per ristoranti italiano.
+    Il tuo unico scopo è gestire prenotazioni.
+    Raccogli sempre: data, orario, numero di coperti, nome e numero di telefono.
+    Se non riesci a soddisfare la richiesta, proponi alternative realistiche.
+    Non rispondere a domande fuori dal contesto prenotazioni ristorante.
+
+training:
+  epochs: 3
+  max_seq_length: 1024
+
+export:
+  gguf: true
+  ollama: true
+  ollama_model_name: agente-ristorante

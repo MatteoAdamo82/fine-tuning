@@ -1,0 +1,29 @@
+# Qwen/Qwen3-0.6B - modello demo/test
+# HuggingFace: https://huggingface.co/Qwen/Qwen3-0.6B
+# Ollama: qwen3:0.6b
+
+model:
+  hf_id: Qwen/Qwen3-0.6B
+  ollama_tag: qwen3:0.6b
+  architecture: qwen3
+  parameters: 0.6B
+
+resources:
+  vram_min_gb: 2
+  vram_recommended_gb: 4
+  ram_cpu_gb: 4
+
+training:
+  lora_target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  batch_size: 2
+  gradient_accumulation_steps: 8
+  max_seq_length: 512
+  lora_r: 8
+  lora_alpha: 16

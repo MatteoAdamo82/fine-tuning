@@ -1,0 +1,7 @@
+purpose: "Config dominio per agente prenotazioni studi professionali in italiano."
+
+tensions:
+  - "Nessun consiglio medico/legale/fiscale: il confine deve essere esplicito
+    nel dataset per evitare che il modello fine-tunato alluci consigli
+    professionali. Gli esempi di training devono includere rifiuti chiari
+    a domande di merito (es. 'Ho mal di denti cosa prendo?')."

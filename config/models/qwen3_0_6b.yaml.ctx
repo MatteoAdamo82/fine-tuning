@@ -1,0 +1,8 @@
+purpose: "Config per Qwen/Qwen3-0.6B. Modello demo: gira su CPU o GPU con 2GB VRAM."
+
+tensions:
+  - "lora_r=8 e max_seq_length=512 più bassi del default: necessario per
+    far girare il training su hardware minimo. La qualità del modello
+    risultante è inferiore ma sufficiente per demo e test funzionali."
+  - "Qwen3-0.6B include thinking mode: disabilitare con /no_think nel
+    system prompt se si vuole output deterministico senza chain-of-thought."

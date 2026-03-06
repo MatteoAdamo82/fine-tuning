@@ -1,0 +1,8 @@
+purpose: "Hyperparameter di training e dataset condivisi. Sovrascritti dai config di dominio."
+
+tensions:
+  - "gradient_accumulation_steps=4 con batch_size=4: effective batch size = 16.
+    Su GPU con poca VRAM (4-6GB) ridurre batch_size a 1 e aumentare
+    gradient_accumulation_steps a 16 per ottenere lo stesso effetto."
+  - "lr_scheduler_type=cosine: più stabile di linear per dataset piccoli
+    (<500 esempi) dove il training termina velocemente."

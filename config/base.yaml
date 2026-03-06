@@ -1,0 +1,29 @@
+# Defaults condivisi per tutti i domain config.
+# I valori qui definiti vengono sovrascritti dai config di dominio.
+
+training:
+  epochs: 3
+  learning_rate: 2.0e-4
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  max_seq_length: 1024
+  warmup_ratio: 0.03
+  lr_scheduler_type: cosine
+  save_steps: 50
+  logging_steps: 10
+  # QLoRA / LoRA
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  lora_bias: none
+
+dataset:
+  n_examples: 150
+  batches: 3
+  gemini_model: gemini-2.0-flash
+  temperature: 1.0
+
+export:
+  gguf: true
+  hf_hub: false
+  ollama: false

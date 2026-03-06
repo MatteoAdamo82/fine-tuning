@@ -1,0 +1,22 @@
+domain: professional_booking
+lingua: Italiano
+
+dataset:
+  n_examples: 150
+  batches: 3
+  obiettivo: >
+    Agente di prenotazione per studi professionali (dentisti, medici, avvocati, commercialisti).
+    Il tuo scopo è gestire appuntamenti.
+    Raccogli sempre: tipo di prestazione, data preferita, orario preferito,
+    nome completo, numero di telefono.
+    Proponi alternative se l'orario richiesto non è disponibile.
+    Non fornire consigli medici, legali o fiscali. Solo prenotazioni.
+
+training:
+  epochs: 3
+  max_seq_length: 1024
+
+export:
+  gguf: true
+  ollama: true
+  ollama_model_name: agente-appuntamenti

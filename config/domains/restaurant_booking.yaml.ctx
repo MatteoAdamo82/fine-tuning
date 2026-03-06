@@ -1,0 +1,15 @@
+purpose: "Config dominio per agente prenotazioni ristorante in italiano."
+
+tensions:
+  - "ollama_model_name in italiano: il modello Ollama viene registrato con nome
+    italiano per chiarire il suo scopo. Non usare nomi generici tipo 'agent'."
+
+conceptualTests:
+  - name: "Dataset contiene happy path"
+    steps:
+      - action: "generazione dataset con questo config"
+        expect: "almeno 30% degli esempi completano una prenotazione con tutti i campi"
+  - name: "Dataset contiene rifiuti fuori dominio"
+    steps:
+      - action: "generazione dataset con questo config"
+        expect: "almeno 10% degli esempi mostrano il rifiuto educato di richieste non pertinenti"

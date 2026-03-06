@@ -1,0 +1,29 @@
+# Qwen/Qwen3-4B - modello produzione bilanciato
+# HuggingFace: https://huggingface.co/Qwen/Qwen3-4B
+# Ollama: qwen3:4b
+
+model:
+  hf_id: Qwen/Qwen3-4B
+  ollama_tag: qwen3:4b
+  architecture: qwen3
+  parameters: 4B
+
+resources:
+  vram_min_gb: 6
+  vram_recommended_gb: 8
+  ram_cpu_gb: 16
+
+training:
+  lora_target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  max_seq_length: 1024
+  lora_r: 16
+  lora_alpha: 32

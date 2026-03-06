@@ -1,0 +1,7 @@
+purpose: "Config per Qwen/Qwen3-4B. Modello produzione: buon equilibrio qualità/risorse."
+
+tensions:
+  - "Qwen3-4B supporta sia thinking mode che non-thinking mode: per task
+    verticali stretti come prenotazioni usare /no_think nel system prompt.
+    Il thinking mode rallenta l'inference e produce output non necessari
+    per task deterministici."

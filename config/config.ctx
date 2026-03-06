@@ -1,0 +1,10 @@
+purpose: >
+  Configurazioni YAML per domini (task verticali) e modelli base.
+  Ogni file dominio contiene sia i parametri di generazione dataset
+  sia gli hyperparameter di training.
+
+tensions:
+  - "Dataset params e training params nello stesso file: viola SoC ma evita
+    drift di configurazione. La generazione dataset e il training sono
+    accoppiati per task: cambiare la lunghezza delle conversazioni richiede
+    di aggiornare anche max_seq_length."

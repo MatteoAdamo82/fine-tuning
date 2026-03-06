@@ -1,0 +1,6 @@
+purpose: "Config dominio per agente di vendita e-commerce in italiano."
+
+tensions:
+  - "Scope limitato a pre-vendita: l'agente non gestisce resi o reclami.
+    Questo è intenzionale: un agente verticale fa UNA cosa bene.
+    La gestione post-vendita richiede un modello diverso con dati diversi."

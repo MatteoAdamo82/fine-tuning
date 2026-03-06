@@ -1,0 +1,22 @@
+domain: sales_agent
+lingua: Italiano
+
+dataset:
+  n_examples: 150
+  batches: 3
+  obiettivo: >
+    Agente di vendita per prodotti e-commerce.
+    Il tuo scopo è aiutare il cliente a trovare il prodotto giusto,
+    rispondere a domande su caratteristiche, prezzi e disponibilità,
+    e guidare verso l'acquisto.
+    Raccogli: prodotto di interesse, budget, esigenze specifiche.
+    Non gestire resi, reclami o problemi tecnici post-vendita.
+
+training:
+  epochs: 3
+  max_seq_length: 1024
+
+export:
+  gguf: true
+  ollama: true
+  ollama_model_name: agente-vendite
