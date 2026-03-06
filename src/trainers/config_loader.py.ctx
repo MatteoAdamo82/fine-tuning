@@ -1,0 +1,22 @@
+purpose: "Carica e unisce i config YAML in un TrainingConfig tipato."
+
+tensions:
+  - "Merge in 4 livelli (base -> dominio -> modello -> overrides): sembra
+    complesso ma necessario. Il modello sovrascrive batch_size e max_seq_length
+    del dominio perché dipendono dalla VRAM disponibile, non dal task."
+  - "FORCE_CPU letto da env var, non da YAML: è un override runtime per test,
+    non una config stabile. Metterlo in YAML porterebbe a commit accidentali
+    che disabilitano la GPU in produzione."
+
+conceptualTests:
+  - name: "Config merged correttamente"
+    steps:
+      - action: "load_config('restaurant_booking', 'qwen3_0_6b')"
+        expect: >
+          config.hf_model_id == 'Qwen/Qwen3-0.6B' e
+          config.lingua == 'Italiano' e
+          config.max_seq_length == 512 (dal model config, non da base)
+  - name: "FORCE_CPU applicato"
+    steps:
+      - action: "FORCE_CPU=true load_config('restaurant_booking')"
+        expect: "config.force_cpu == True"

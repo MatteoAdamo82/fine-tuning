@@ -1,0 +1,28 @@
+purpose: "Esegue QLoRA fine-tuning con TRL SFTTrainer e salva il modello merged."
+
+tensions:
+  - "merge_and_unload() alla fine del training: l'adapter LoRA viene fuso nel
+    modello base e salvato come modello standard. Questo raddoppia lo spazio
+    su disco ma è necessario per GGUF export e Ollama. Un modello con adapter
+    separato non può essere convertito direttamente."
+  - "report_to='none': disabilita Wandb e TensorBoard. Non sono configurati
+    di default e causerebbero errori. Aggiungere logging esterno richiede
+    configurazione esplicita nel config YAML."
+  - "SFTTrainer con processing_class=tokenizer: gestisce automaticamente il
+    chat template via tokenizer.apply_chat_template sui campi 'messages'.
+    Non serve un formatting_func custom se il dataset è già in formato ChatML."
+  - "pad_token = eos_token se mancante: Qwen3 e altri modelli non hanno un
+    pad token separato. Senza questa riga il training crasherebbe su batch
+    con sequenze di lunghezza diversa."
+
+workflows:
+  training: >
+    load tokenizer -> load model (4bit se GPU) -> LoraConfig ->
+    load JSONL dataset -> SFTConfig -> SFTTrainer.train() ->
+    save adapter -> merge_and_unload() -> save merged model
+
+conceptualTests:
+  - name: "Training CPU completa senza errori"
+    steps:
+      - action: "FORCE_CPU=true run_training con dataset 10 esempi"
+        expect: "merged model salvato in outputs/checkpoints/{run_id}/merged/"
