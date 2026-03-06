@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
 
 from google import genai
 from google.genai import types
+from google.genai.errors import ClientError
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
@@ -30,6 +32,38 @@ class GeminiDatasetGenerator:
             raise ValueError("GEMINI_API_KEY environment variable not set")
         self.client = genai.Client(api_key=api_key)
         self.model = model
+
+    def _generate_with_retry(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        temperature: float,
+        max_retries: int = 5,
+    ):
+        """Calls Gemini with exponential backoff on 429 rate-limit errors."""
+        delay = 30  # seconds — respect free-tier RPM limit
+        for attempt in range(max_retries):
+            try:
+                return self.client.models.generate_content(
+                    model=self.model,
+                    contents=user_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_prompt,
+                        temperature=temperature,
+                        max_output_tokens=8192,
+                        response_mime_type="application/json",
+                    ),
+                )
+            except ClientError as e:
+                if getattr(e, "code", None) == 429 and attempt < max_retries - 1:
+                    console.print(
+                        f"[yellow]Rate limit hit (429), waiting {delay}s "
+                        f"(attempt {attempt + 1}/{max_retries})...[/yellow]"
+                    )
+                    time.sleep(delay)
+                    delay = min(delay * 2, 120)  # cap at 2 minutes
+                else:
+                    raise
 
     def generate_batch(
         self,
@@ -51,15 +85,10 @@ class GeminiDatasetGenerator:
             n_examples=n_examples,
         )
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                temperature=temperature,
-                max_output_tokens=8192,
-                response_mime_type="application/json",
-            ),
+        response = self._generate_with_retry(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            temperature=temperature,
         )
 
         try:
@@ -142,6 +171,9 @@ class GeminiDatasetGenerator:
                 console.print(
                     f"[green]Batch {batch_idx + 1}: {len(examples)} examples written[/green]"
                 )
+                # Pause between batches to respect free-tier RPM limits
+                if batch_idx < batches - 1:
+                    time.sleep(10)
 
         console.print(
             f"[bold green]Dataset complete: {total_written} examples → {output_path}[/bold green]"

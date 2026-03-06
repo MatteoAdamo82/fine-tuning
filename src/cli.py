@@ -201,7 +201,7 @@ def list_domains() -> None:
     for yaml_file in sorted(domains_dir.glob("*.yaml")):
         with open(yaml_file) as f:
             data = yaml.safe_load(f)
-        obiettivo = data.get("obiettivo", "").strip().replace("\n", " ")[:60]
+        obiettivo = (data.get("obiettivo") or data.get("dataset", {}).get("obiettivo") or "").strip().replace("\n", " ")[:60]
         table.add_row(
             yaml_file.stem,
             data.get("lingua", "—"),
