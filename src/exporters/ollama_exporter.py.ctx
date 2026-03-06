@@ -1,0 +1,9 @@
+purpose: "Genera Modelfile Ollama con system prompt embedded e registra il modello localmente."
+
+tensions:
+  - "temperature=0.3 nel Modelfile: più bassa del default Ollama (0.8).
+    Per agenti verticali deterministici (prenotazioni, vendite) la creatività
+    bassa è desiderata. L'utente può sempre sovrascrivere con --temperature."
+  - "Il system prompt viene embeddato nel Modelfile, non passato a runtime:
+    questo garantisce che il modello Ollama sia usabile direttamente con
+    'ollama run nome' senza dover sempre specificare il system prompt."

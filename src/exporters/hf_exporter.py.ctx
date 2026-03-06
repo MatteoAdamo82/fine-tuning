@@ -1,0 +1,9 @@
+purpose: "Pusha il modello merged su HuggingFace Hub."
+
+tensions:
+  - "Carica il modello in memoria per fare push: necessario per usare
+    model.push_to_hub() invece di huggingface_hub.upload_folder().
+    L'alternativa upload_folder è più veloce ma non genera la model card
+    automatica con i metadati corretti."
+  - "private=True come default: sicurezza prima di tutto. L'utente deve
+    scegliere esplicitamente di rendere pubblico il modello fine-tunato."

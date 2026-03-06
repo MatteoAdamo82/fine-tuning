@@ -1,0 +1,10 @@
+purpose: "Converte un modello HuggingFace merged in GGUF via llama.cpp."
+
+tensions:
+  - "Dipendenza esterna da llama.cpp non installata come package: llama.cpp
+    si clona separatamente. Non è un package pip stabile e la versione del
+    convert script deve corrispondere alla versione di llama.cpp installata.
+    Tentare di bundlarlo aumenterebbe la complessità senza benefici."
+  - "q4_k_m come default: buon equilibrio tra dimensione file e qualità.
+    q8_0 è più preciso ma doppio in dimensione. f16 è full precision
+    (solo per debug o GPU con molta VRAM)."
