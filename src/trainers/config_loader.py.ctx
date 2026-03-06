@@ -11,12 +11,21 @@ tensions:
 conceptualTests:
   - name: "Config merged correttamente"
     steps:
-      - action: "load_config('restaurant_booking', 'qwen3_0_6b')"
+      - action: >
+          load_config('restaurant_booking', 'qwen3_0_6b') dove:
+          config/models/qwen3_0_6b.yaml esiste e contiene training.max_seq_length=512,
+          config/domains/restaurant_booking.yaml contiene training.max_seq_length=1024.
+          Il merge è base -> domain -> model: il model sovrascrive il domain.
         expect: >
-          config.hf_model_id == 'Qwen/Qwen3-0.6B' e
-          config.lingua == 'Italiano' e
-          config.max_seq_length == 512 (dal model config, non da base)
+          config.hf_model_id == 'Qwen/Qwen3-0.6B' (da model.hf_id),
+          config.lingua == 'Italiano' (dal domain),
+          config.max_seq_length == 512 (model sovrascrive domain che ha 1024)
   - name: "FORCE_CPU applicato"
     steps:
       - action: "FORCE_CPU=true load_config('restaurant_booking')"
         expect: "config.force_cpu == True"
+
+ref:
+  - config/base.yaml
+  - config/domains/restaurant_booking.yaml
+  - config/models/qwen3_0_6b.yaml
